@@ -3,72 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartDeals - המדריך למוצרים הכי שווים ברשת</title>
+    <title>אלי דילס - פורטל המבצעים הישראלי לאלי אקספרס</title>
     <style>
+        /* CSS Reset & Core Typography */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         body { background-color: #f4f5f7; color: #333; line-height: 1.6; }
-        header { background: #1a1a2e; color: #fff; padding: 1rem 5%; text-align: center; }
-        header h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
-        header p { color: #00d2d3; font-size: 0.9rem; }
-        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        
+        /* Branding & Header (Deep Blue from Logo) */
+        header { background: #0A3A66; color: #fff; padding: 1.5rem 5%; text-align: center; border-bottom: 4px solid #FF6B00; }
+        header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.3rem; letter-spacing: 1px; }
+        header p { color: #e0e0e0; font-size: 1rem; }
+        
+        /* Mobile-First Layout Grid */
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-        .card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; }
-        .card:hover { transform: translateY(-5px); }
-        .card-img { height: 200px; background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #777; }
-        .card-body { padding: 1.2rem; }
-        .tag { background: #ffeaa7; color: #d63031; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-        .card-title { font-size: 1.2rem; margin: 0.5rem 0; color: #2d3436; }
-        .card-desc { font-size: 0.88rem; color: #636e72; margin-bottom: 1rem; }
-        .btn { display: block; width: 100%; text-align: center; background: #ff4757; color: #fff; padding: 0.7rem; border-radius: 6px; text-decoration: none; font-weight: bold; }
-        footer { text-align: center; padding: 2rem; color: #b2bec3; font-size: 0.8rem; border-top: 1px solid #eee; margin-top: 3rem; }
+        
+        /* Card UI Architecture */
+        .card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.06); display: flex; flex-direction: column; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        
+        /* Embed Container */
+        .card-img { text-align: center; background-color: #fff; padding: 1rem 0; border-bottom: 1px solid #f0f0f0; }
+        .card-img img { max-width: 100%; height: auto; transition: opacity 0.2s; }
+        .card-img img:hover { opacity: 0.85; }
+        
+        /* Copywriting Section */
+        .card-body { padding: 1.2rem; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-title { font-size: 1.15rem; margin-bottom: 0.5rem; color: #0A3A66; font-weight: 700; line-height: 1.3; }
+        .card-desc { font-size: 0.9rem; color: #555; margin-bottom: 1.5rem; flex-grow: 1; }
+        
+        /* CTA Button (Vibrant Orange from Logo) */
+        .btn { display: block; width: 100%; text-align: center; background: #FF6B00; color: #fff; padding: 0.8rem; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(255, 107, 0, 0.2); transition: background 0.2s; }
+        .btn:hover { background: #e65c00; }
+        
+        /* Compliance Footer */
+        footer { text-align: center; padding: 2rem; color: #888; font-size: 0.8rem; border-top: 1px solid #ddd; margin-top: 3rem; background: #fff; }
     </style>
+
+    <!-- Technical Tracking Architecture (S2S Preparation) -->
+    <script>
+        // Module: Cookie Management & URL Parameter Extraction
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/;SameSite=Lax;Secure";
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        // Module: SubID Generation for Event Match Quality (EMQ)
+        function generateSubID() {
+            return 'sub_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
+        }
+
+        // Module: Execution on DOM Load
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // 1. Capture and store Meta Click ID (fbclid)
+            const fbclid = getQueryParam('fbclid');
+            if (fbclid) {
+                setCookie('sa_fbclid', fbclid, 7);
+            }
+
+            // 2. Manage SubID state
+            let currentSubID = getCookie('sa_subid');
+            if (!currentSubID) {
+                currentSubID = generateSubID();
+                setCookie('sa_subid', currentSubID, 7);
+            }
+
+            // 3. Dynamic URL Parameter Injection (Appending subid1 to Affiliate Links)
+            const affLinks = document.querySelectorAll('.affiliate-link, .card-img a');
+            affLinks.forEach(link => {
+                try {
+                    let originalUrl = new URL(link.href);
+                    originalUrl.searchParams.set('subid1', currentSubID); 
+                    link.href = originalUrl.toString();
+                } catch(e) {
+                    console.error('URL Parsing Error on: ', link.href);
+                }
+            });
+        });
+    </script>
 </head>
 <body>
 
     <header>
-        <h1>SmartDeals Israel</h1>
-        <p>סקירות עומק, גאדג'טים ופתרונות חכמים לבית ולרכב</p>
+        <h1>אלי דילס</h1>
+        <p>פורטל המבצעים הישראלי לאלי אקספרס</p>
     </header>
 
     <div class="container">
         <div class="grid">
-            <!-- מוצר 1 -->
+
+            <!-- מוצר 1: מוניטור לתינוק -->
             <div class="card">
-                <div class="card-img" style="background: #e1f5fe;">תמונת גאדג'ט לבית</div>
+                <div class="card-img">
+                    <a href="https://s.click.aliexpress.com/e/_c3Vacort" target="_blank"><img src="//ae01.alicdn.com/kf/Sa688591905bd4605b02e6e950e1b7b99k.jpg_140x140.jpg" /></a>
+                </div>
                 <div class="card-body">
-                    <span class="tag">סקירה מומלצת</span>
-                    <h2 class="card-title">שואב אבק רובוטי נטען לרכב ולבית</h2>
-                    <p class="card-desc">בדקנו את השואב הנייד הכי נמכר החודש: עוצמת שאיבה, אורך חיי סוללה והאם הוא באמת שווה את המחיר?</p>
-                    <a href="#" class="btn">לסקירה המלאה והשוואת מחירים</a>
+                    <h2 class="card-title">מוניטור אלחוטי לתינוק עם מסך 3.2" ומצלמת לילה</h2>
+                    <p class="card-desc">אל תשאירו את הבטיחות ליד המקרה. צפייה בזמן אמת ב-720P HD, דיבור דו-כיווני כדי להרגיע את התינוק מרחוק, וסוללה עוצמתית המחזיקה שעות. כיסוי קליטה אדיר של עד 260 מטר מחוץ לבית.</p>
+                    <a href="https://s.click.aliexpress.com/e/_c3Vacort" class="btn affiliate-link" target="_blank">לרכישה במחיר מבצע</a>
                 </div>
             </div>
 
-            <!-- מוצר 2 -->
+            <!-- מוצר 2: סילונית מים -->
             <div class="card">
-                <div class="card-img" style="background: #fff3e0;">תמונת מוצר רכב</div>
+                <div class="card-img">
+                    <a href="https://s.click.aliexpress.com/e/_c4pWELSj" target="_blank"><img src="//ae01.alicdn.com/kf/S866c9dbd2ad349fbaa48c9f050959817C.png_140x140.png" /></a>
+                </div>
                 <div class="card-body">
-                    <span class="tag">מוצר השבוע</span>
-                    <h2 class="card-title">מצלמת דרך חכמה עם תצוגת לילה</h2>
-                    <p class="card-desc">מדריך רכישה: המצלמה הקומפקטית שכוללת חיישן זיהוי תנועה וחיבור מהיר לאפליקציה בטלפון.</p>
-                    <a href="#" class="btn">לסקירה המלאה והשוואת מחירים</a>
+                    <h2 class="card-title">סילונית מים אלחוטית Mornwell לניקוי שיניים עמוק</h2>
+                    <p class="card-desc">הפסיקו לדמם מחוט דנטלי. טכנולוגיית פולסים מתקדמת המסירה 99.9% מהפלאק ומונעת ריח רע מהפה. מיכל 300 מ"ל משודרג, עמידות מלאה למים (IPX7) וסוללה מפלצתית שמספיקה ל-30 יום בטעינה אחת.</p>
+                    <a href="https://s.click.aliexpress.com/e/_c4pWELSj" class="btn affiliate-link" target="_blank">לרכישה במחיר מבצע</a>
                 </div>
             </div>
 
-            <!-- מוצר 3 -->
+            <!-- מוצר 3: בוסטר התנעה -->
             <div class="card">
-                <div class="card-img" style="background: #f3e5f5;">תמונת אקססוריז</div>
+                <div class="card-img">
+                    <a href="https://s.click.aliexpress.com/e/_c3duEnzt" target="_blank"><img src="//ae01.alicdn.com/kf/Sd933cbba2684414daf62148981005532G.jpg_140x140.jpg" /></a>
+                </div>
                 <div class="card-body">
-                    <span class="tag">מבצעי משלוח חינם</span>
-                    <h2 class="card-title">ערכת ארגון מודולרית למטבח ולמזווה</h2>
-                    <p class="card-desc">פתרונות אחסון מתקדמים שעושים סדר בבית: סקירת איכות חומרים ועמידות לאורך זמן.</p>
-                    <a href="#" class="btn">לסקירה המלאה והשוואת מחירים</a>
+                    <h2 class="card-title">בוסטר התנעה לרכב 4 ב-1 + קומפרסור מובנה</h2>
+                    <p class="card-desc">נתקעתם בלי מצבר או עם פנצ'ר? המכשיר העוצמתי הזה (1200A Peak) יניע לכם את הרכב בשניות, ינפח גלגלים בלחץ 150PSI, וישמש גם כסוללת גיבוי ניידת עם פנס עוצמתי. חובה בכל תא כפפות למצבי חירום.</p>
+                    <a href="https://s.click.aliexpress.com/e/_c3duEnzt" class="btn affiliate-link" target="_blank">לרכישה במחיר מבצע</a>
                 </div>
             </div>
+
+            <!-- מוצר 4: מקרן חכם -->
+            <div class="card">
+                <div class="card-img">
+                    <a href="https://s.click.aliexpress.com/e/_c3on9rbl" target="_blank"><img src="//ae01.alicdn.com/kf/S621beff0742449f381473c5ad2aa883co.jpeg_140x140.jpeg" /></a>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">מקרן חכם Magcubic HY300 Pro עם מערכת Android 14</h2>
+                    <p class="card-desc">קולנוע ביתי פרימיום בסלון או בחצר. תמיכה ב-8K, חיבור WiFi 6 כפול לסטרימינג חלק וללא תקיעות, ורזולוציית 1080P טבעית. חיבור Bluetooth 5.4 לחוויית סאונד אלחוטית מושלמת מול סרטים ומשחקים.</p>
+                    <a href="https://s.click.aliexpress.com/e/_c3on9rbl" class="btn affiliate-link" target="_blank">לרכישה במחיר מבצע</a>
+                </div>
+            </div>
+
+            <!-- מוצר 5: מדבקת תיקון רשתות -->
+            <div class="card">
+                <div class="card-img">
+                    <a href="https://s.click.aliexpress.com/e/_c3bUj5Ld" target="_blank"><img src="//ae01.alicdn.com/kf/Sa75394cff8cb4e2eb30dacb73d932681P.jpg_140x140.jpg" /></a>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">סרט דביק לתיקון רשתות יתושים - עמיד למים</h2>
+                    <p class="card-desc">יתושים נכנסים דרך חור ברשת? אל תחליפו את כל החלון! מדבקת הרשת החכמה והחזקה הזו אוטמת קרעים בשניות ומחזיקה מעמד לאורך זמן, גם בתנאי לחות וגשם. פתרון חסכוני וחובה לקיץ הישראלי.</p>
+                    <a href="https://s.click.aliexpress.com/e/_c3bUj5Ld" class="btn affiliate-link" target="_blank">לרכישה במחיר מבצע</a>
+                </div>
+            </div>
+
+            <!-- מוצר 6: מפוח אוויר -->
+            <div class="card">
+                <div class="card-img">
+                    <a href="https://s.click.aliexpress.com/e/_c2zKrlcJ" target="_blank"><img src="//ae01.alicdn.com/kf/S9fb935612f61463793a8cd836034325as.jpg_140x140.jpg" /></a>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">מפוח אוויר טורבו אלחוטי P70 לניקוי יסודי של אבק</h2>
+                    <p class="card-desc">זרקו את פחיות האוויר הדחוס היקרות. מפוח נטען ועוצמתי בטירוף (110,000 סל"ד) עם 4 עוצמות מובנות ותאורת LED. מושלם לניקוי מקלדות, חלקי מחשב פנימיים, פנים הרכב ומקומות שקשה להגיע אליהם.</p>
+                    <a href="https://s.click.aliexpress.com/e/_c2zKrlcJ" class="btn affiliate-link" target="_blank">לרכישה במחיר מבצע</a>
+                </div>
+            </div>
+
+            <!-- מוצר 7: מצלמת דרך -->
+            <div class="card">
+                <div class="card-img">
+                    <a href="https://s.click.aliexpress.com/e/_c3UMWabt" target="_blank"><img src="//ae01.alicdn.com/kf/Sf474f5895edf44db9d2034bb31e3ea92I.jpg_140x140.jpg" /></a>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">מצלמת דרך לרכב 4K UHD עם ראיית לילה ו-WiFi</h2>
+                    <p class="card-desc">תעדו כל רגע בכביש באיכות קולנועית למקרה של תאונה או קנס שגוי. המצלמה כוללת מערכת ניטור חניה 24/7, תמיכה ב-GPS, וחיבור אלחוטי (Wi-Fi) ישיר לאפליקציה בטלפון לשליפת סרטונים מיידית.</p>
+                    <a href="https://s.click.aliexpress.com/e/_c3UMWabt" class="btn affiliate-link" target="_blank">לרכישה במחיר מבצע</a>
+                </div>
+            </div>
+
+            <!-- מוצר 8: מיקרוסקופ דיגיטלי -->
+            <div class="card">
+                <div class="card-img">
+                    <a href="https://s.click.aliexpress.com/e/_c4rL2EvH" target="_blank"><img src="//ae01.alicdn.com/kf/S641e5b8b799449eb8bd58e0bb4e2b0bf5.jpg_140x140.jpg" /></a>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">מיקרוסקופ דיגיטלי נייד (הגדלה X1000) עם מסך 2.0"</h2>
+                    <p class="card-desc">המתנה המושלמת שתנתק את הילדים מהמסכים הרגילים! מיקרוסקופ נטען, קומפקטי וקל במיוחד שמאפשר לסטודנטים וילדים לחקור את הטבע, חרקים וחומרים שונים ברזולוציה מטורפת בכל מקום.</p>
+                    <a href="https://s.click.aliexpress.com/e/_c4rL2EvH" class="btn affiliate-link" target="_blank">לרכישה במחיר מבצע</a>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <footer>
-        <p>© 2026 SmartDeals Israel. כל הזכויות שמורות. האתר משתתף בתוכניות אפילייט ועלול להרוויח עמלות מקניות.</p>
+        <p>© 2026 אלי דילס. כל הזכויות שמורות. האתר מופעל כפורטל צרכנות המשתתף בתוכניות אפילייאט ועלול להרוויח עמלות מהפניות.</p>
     </footer>
 
 </body>
