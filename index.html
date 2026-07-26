@@ -219,6 +219,53 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <footer>
         <p>© 2026 אלי דילס. כל הזכויות שמורות. האתר מופעל כפורטל צרכנות המשתתף בתוכניות אפילייאט ועלול להרוויח עמלות מהפניות.</p>
     </footer>
+    
+<!-- Meta CAPI SubID Capture & Affiliate Injection Engine -->
+<script>
+(function() {
+    // 1. פונקציה לחילוץ פרמטרים משורת ה-URL
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
 
+    // 2. איתור fbclid וייצור מחרוזת fbc תקנית
+    var fbclid = getUrlParameter('fbclid');
+    var fbcString = '';
+
+    if (fbclid) {
+        // יצירת חותמת זמן Unix בשניות
+        var unixTimestamp = Math.floor(Date.now() / 1000);
+        fbcString = 'fb.1.' + unixTimestamp + '.' + fbclid;
+        // שמירה בזיכרון המקומי של הדפדפן לשרידות בסשן
+        localStorage.setItem('_sa_meta_fbc', fbcString);
+    } else {
+        // ניסיון שליפה מהזיכרון המקומי במקרה של מעבר בין דפים באתר
+        fbcString = localStorage.getItem('_sa_meta_fbc') || '';
+    }
+
+    // 3. הזרקת ה-fbc לכל קישורי האפילייאט של AliExpress בעמוד
+    if (fbcString) {
+        document.addEventListener('DOMContentLoaded', function() {
+            // איתור כל התגיות שמכילות קישורי אליאקספרס (כולל s.click)
+            var affiliateLinks = document.querySelectorAll('a[href*="aliexpress.com"], a[href*="s.click"]');
+            
+            affiliateLinks.forEach(function(link) {
+                var currentHref = link.getAttribute('href');
+                // בדיקה האם הקישור כבר מכיל פרמטרים (סימן שאלה) כדי לדעת האם לשרשר עם & או ?
+                var separator = currentHref.indexOf('?') !== -1 ? '&' : '?';
+                
+                // הערה קריטית: אם אתה עובד מול Admitad שנה כאן מ-'sub_id=' ל-'subid1='
+                var newHref = currentHref + separator + 'sub_id=' + encodeURIComponent(fbcString);
+                
+                link.setAttribute('href', newHref);
+            });
+        });
+    }
+})();
+</script>
+    
 </body>
 </html>
