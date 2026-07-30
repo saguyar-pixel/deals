@@ -7,7 +7,7 @@
     <style>
         /* CSS Reset & Core Typography */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: #f4f5f7; color: #333; line-height: 1.6; }
+        body { background-color: #f4f5f7; color: #333; line-height: 1.6; position: relative; }
         
         /* Branding & Header (Deep Blue from Logo) */
         header { background: #0A3A66; color: #fff; padding: 1.5rem 5%; text-align: center; border-bottom: 4px solid #FF6B00; }
@@ -38,6 +38,55 @@
         
         /* Compliance Footer */
         footer { text-align: center; padding: 2rem; color: #888; font-size: 0.8rem; border-top: 1px solid #ddd; margin-top: 3rem; background: #fff; }
+
+        /* ==================== BANNERS STYLING ==================== */
+        
+        /* General Banner Reset */
+        .banner-container { text-align: center; margin: 1rem auto; width: 100%; overflow: hidden; }
+        .banner-container img { max-width: 100%; height: auto; display: inline-block; }
+
+        /* Mobile In-Feed Banners (Visible ONLY on Mobile) */
+        .mobile-banner { display: none; }
+        @media (max-width: 768px) {
+            .mobile-banner { display: block; }
+        }
+
+        /* Mobile Sticky Bottom Banner */
+        .mobile-sticky-banner {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+            z-index: 9999;
+            text-align: center;
+            padding: 5px 0;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        
+        /* Active State for Mobile Floating Banner */
+        .mobile-sticky-banner.is-visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (min-width: 769px) {
+            .mobile-sticky-banner { display: none !important; }
+        }
+
+        /* Desktop Side Skyscraper Banners (Visible ONLY on Desktop >= 1200px) */
+        .desktop-side-banner { display: none; position: fixed; top: 120px; z-index: 1000; }
+        .desktop-side-banner.left { left: 10px; }
+        .desktop-side-banner.right { right: 10px; }
+        .desktop-side-banner img { width: 120px; height: auto; }
+
+        @media (min-width: 1280px) {
+            .desktop-side-banner { display: block; }
+        }
     </style>
     
 <!-- Google Tag Manager -->
@@ -109,10 +158,24 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PBXN2CQM"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Desktop Floating Side Banners (Left & Right) -->
+    <div class="desktop-side-banner left">
+        <a href='https://s.click.aliexpress.com/e/_c3Jamzqj?bz=120*600' target='_parent'><img width='725' height='90' src='https://ae-pic-a1.aliexpress-media.com/kf/Sb560fc8a2436401c8f0af74f99840c057.png' alt="AliExpress Banner" /></a>
+    </div>
+    <div class="desktop-side-banner right">
+        <a href='https://s.click.aliexpress.com/e/_c3Jamzqj?bz=120*600' target='_parent'><img width='725' height='90' src='https://ae-pic-a1.aliexpress-media.com/kf/Sb560fc8a2436401c8f0af74f99840c057.png' alt="AliExpress Banner" /></a>
+    </div>
+
     <header>
         <h1>אלי דילס</h1>
         <p>פורטל המבצעים הישראלי לאלי אקספרס</p>
     </header>
+
+    <!-- Mobile Top Banner (Below Header, Before Products) -->
+    <div class="banner-container mobile-banner" id="mobile-top-banner">
+        <a href='https://s.click.aliexpress.com/e/_c4bPnmLp?bz=320*480' target='_parent'><img width='725' height='90' src='https://ae-pic-a1.aliexpress-media.com/kf/Sceb8211194b64dc59b45d541d1e14556K.png' alt="AliExpress Banner" /></a>
+    </div>
 
     <div class="container">
         <div class="grid">
@@ -216,9 +279,55 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
 
+    <!-- Mobile Bottom Banner (Above Footer) -->
+    <div class="banner-container mobile-banner" id="mobile-bottom-banner">
+        <a href='https://s.click.aliexpress.com/e/_c4bPnmLp?bz=320*480' target='_parent'><img width='725' height='90' src='https://ae-pic-a1.aliexpress-media.com/kf/Sceb8211194b64dc59b45d541d1e14556K.png' alt="AliExpress Banner" /></a>
+    </div>
+
     <footer>
         <p>© 2026 אלי דילס. כל הזכויות שמורות. האתר מופעל כפורטל צרכנות המשתתף בתוכניות אפילייאט ועלול להרוויח עמלות מהפניות.</p>
     </footer>
+
+    <!-- Mobile Sticky Floating Banner (Appears only when top/bottom banners are NOT visible) -->
+    <div class="mobile-sticky-banner" id="mobile-sticky-banner">
+        <a href='https://s.click.aliexpress.com/e/_c3b1XcjD?bz=725*90' target='_parent'><img width='725' height='90' src='https://ae-pic-a1.aliexpress-media.com/kf/Sa487b37053bd482795f7d1a4fc830381e.png' alt="AliExpress Floating Banner" /></a>
+    </div>
+
+    <!-- Script to toggle Floating Banner on Mobile -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.innerWidth <= 768) {
+                const topBanner = document.getElementById('mobile-top-banner');
+                const bottomBanner = document.getElementById('mobile-bottom-banner');
+                const stickyBanner = document.getElementById('mobile-sticky-banner');
+
+                let topVisible = false;
+                let bottomVisible = false;
+
+                function updateStickyVisibility() {
+                    if (!topVisible && !bottomVisible) {
+                        stickyBanner.classList.add('is-visible');
+                    } else {
+                        stickyBanner.classList.remove('is-visible');
+                    }
+                }
+
+                const observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.target.id === 'mobile-top-banner') {
+                            topVisible = entry.isIntersecting;
+                        } else if (entry.target.id === 'mobile-bottom-banner') {
+                            bottomVisible = entry.isIntersecting;
+                        }
+                    });
+                    updateStickyVisibility();
+                }, { threshold: 0.1 });
+
+                if (topBanner) observer.observe(topBanner);
+                if (bottomBanner) observer.observe(bottomBanner);
+            }
+        });
+    </script>
     
 <!-- Meta CAPI SubID Capture, Injection & S2S Click-Out Engine (Universal Listener) -->
 <script>
