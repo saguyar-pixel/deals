@@ -4,10 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>אלי דילס - פורטל המבצעים הישראלי לאלי אקספרס</title>
+    
+    <!-- Google Fonts: Heebo (Hebrew & Latin) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
     <style>
-        /* CSS Reset & Core Typography */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: #f4f5f7; color: #333; line-height: 1.6; position: relative; padding-bottom: 110px; } /* מרווח תחתון למניעת הסתרת פוטר על ידי ה-CTA הצף */
+        /* CSS Reset & Core Typography - Unified Heebo Font */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Heebo', system-ui, -apple-system, sans-serif; 
+        }
+        
+        body { 
+            background-color: #f4f5f7; 
+            color: #333; 
+            line-height: 1.6; 
+            position: relative; 
+            padding-bottom: 110px; /* מרווח תחתון למניעת הסתרת פוטר על ידי ה-CTA הצף */
+        }
         
         /* Branding & Header (Deep Blue from Logo) */
         header { background: #0A3A66; color: #fff; padding: 1.5rem 5%; text-align: center; border-bottom: 4px solid #FF6B00; }
@@ -60,7 +78,7 @@
             width: 100%;
             background: rgba(255, 255, 255, 0.98);
             box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
-            z-index: 99999; /* מובטח מעל כולו */
+            z-index: 99999;
             text-align: center;
             padding: 6px 8px;
             transition: transform 0.3s ease, opacity 0.3s ease;
@@ -334,7 +352,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 let bottomVisible = false;
 
                 function updateStickyVisibility() {
-                    // ה-Sticky יופיע תמיד, חוץ ממתי שאחד מהבאנרים הנייחים ממש גלוי על המסך
                     if (topVisible || bottomVisible) {
                         stickyWrapper.classList.add('is-hidden');
                     } else {
