@@ -7,7 +7,7 @@
     <style>
         /* CSS Reset & Core Typography */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: #f4f5f7; color: #333; line-height: 1.6; position: relative; }
+        body { background-color: #f4f5f7; color: #333; line-height: 1.6; position: relative; padding-bottom: 110px; } /* מרווח תחתון למניעת הסתרת פוטר על ידי ה-CTA הצף */
         
         /* Branding & Header (Deep Blue from Logo) */
         header { background: #0A3A66; color: #fff; padding: 1.5rem 5%; text-align: center; border-bottom: 4px solid #FF6B00; }
@@ -39,7 +39,7 @@
         /* Compliance Footer */
         footer { text-align: center; padding: 2rem; color: #888; font-size: 0.8rem; border-top: 1px solid #ddd; margin-top: 3rem; background: #fff; }
 
-        /* ==================== BANNERS STYLING ==================== */
+        /* ==================== BANNERS & FLOATING CTA STYLING ==================== */
         
         /* General Banner Reset */
         .banner-container { text-align: center; margin: 1rem auto; width: 100%; overflow: hidden; }
@@ -51,34 +51,57 @@
             .mobile-banner { display: block; }
         }
 
-        /* Mobile Sticky Bottom Banner */
-        .mobile-sticky-banner {
+        /* Mobile Sticky Bottom Floating Wrapper (Banner + Red CTA Button) */
+        .mobile-sticky-wrapper {
             display: none;
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
-            z-index: 9999;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+            z-index: 99999; /* מובטח מעל כולו */
             text-align: center;
-            padding: 5px 0;
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-            transform: translateY(100%);
-            opacity: 0;
-        }
-        
-        /* Active State for Mobile Floating Banner */
-        .mobile-sticky-banner.is-visible {
+            padding: 6px 8px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
             transform: translateY(0);
             opacity: 1;
         }
 
-        @media (min-width: 769px) {
-            .mobile-sticky-banner { display: none !important; }
+        /* Red AliExpress Floating CTA Button */
+        .floating-ali-btn {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 4px auto 0 auto;
+            background: #FF4747; /* אדום אליאקספרס */
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 1.15rem;
+            padding: 0.75rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(255, 71, 71, 0.4);
+            letter-spacing: 0.5px;
+            text-align: center;
+            border: none;
+        }
+        .floating-ali-btn:active {
+            transform: scale(0.98);
         }
 
-        /* Desktop Side Skyscraper Banners (Visible ONLY on Desktop >= 1200px) */
+        /* Sticky Hidden State */
+        .mobile-sticky-wrapper.is-hidden {
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-sticky-wrapper { display: block; }
+        }
+
+        /* Desktop Side Skyscraper Banners (Visible ONLY on Desktop >= 1280px) */
         .desktop-side-banner { display: none; position: fixed; top: 120px; z-index: 1000; }
         .desktop-side-banner.left { left: 10px; }
         .desktop-side-banner.right { right: 10px; }
@@ -86,6 +109,7 @@
 
         @media (min-width: 1280px) {
             .desktop-side-banner { display: block; }
+            body { padding-bottom: 0; }
         }
     </style>
     
@@ -288,27 +312,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p>© 2026 אלי דילס. כל הזכויות שמורות. האתר מופעל כפורטל צרכנות המשתתף בתוכניות אפילייאט ועלול להרוויח עמלות מהפניות.</p>
     </footer>
 
-    <!-- Mobile Sticky Floating Banner (Appears only when top/bottom banners are NOT visible) -->
-    <div class="mobile-sticky-banner" id="mobile-sticky-banner">
-        <a href='https://s.click.aliexpress.com/e/_c3b1XcjD?bz=725*90' target='_parent'><img width='725' height='90' src='https://ae-pic-a1.aliexpress-media.com/kf/Sa487b37053bd482795f7d1a4fc830381e.png' alt="AliExpress Floating Banner" /></a>
+    <!-- Mobile Sticky Bottom Floating Wrapper (Banner + Red CTA Button) -->
+    <div class="mobile-sticky-wrapper" id="mobile-sticky-wrapper">
+        <a href='https://s.click.aliexpress.com/e/_c3b1XcjD?bz=725*90' target='_parent'>
+            <img width='725' height='90' src='https://ae-pic-a1.aliexpress-media.com/kf/Sa487b37053bd482795f7d1a4fc830381e.png' alt="AliExpress Floating Banner" />
+        </a>
+        <a href="https://s.click.aliexpress.com/e/_c3b1XcjD" class="floating-ali-btn" target="_blank">
+            יאללה לאלי אקספרס! 🚀
+        </a>
     </div>
 
-    <!-- Script to toggle Floating Banner on Mobile -->
+    <!-- Script to manage Floating Banner & CTA Visibility on Mobile -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (window.innerWidth <= 768) {
                 const topBanner = document.getElementById('mobile-top-banner');
                 const bottomBanner = document.getElementById('mobile-bottom-banner');
-                const stickyBanner = document.getElementById('mobile-sticky-banner');
+                const stickyWrapper = document.getElementById('mobile-sticky-wrapper');
 
                 let topVisible = false;
                 let bottomVisible = false;
 
                 function updateStickyVisibility() {
-                    if (!topVisible && !bottomVisible) {
-                        stickyBanner.classList.add('is-visible');
+                    // ה-Sticky יופיע תמיד, חוץ ממתי שאחד מהבאנרים הנייחים ממש גלוי על המסך
+                    if (topVisible || bottomVisible) {
+                        stickyWrapper.classList.add('is-hidden');
                     } else {
-                        stickyBanner.classList.remove('is-visible');
+                        stickyWrapper.classList.remove('is-hidden');
                     }
                 }
 
@@ -321,7 +351,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         }
                     });
                     updateStickyVisibility();
-                }, { threshold: 0.1 });
+                }, { threshold: 0.15 });
 
                 if (topBanner) observer.observe(topBanner);
                 if (bottomBanner) observer.observe(bottomBanner);
