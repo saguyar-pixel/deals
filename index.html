@@ -220,10 +220,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p>© 2026 אלי דילס. כל הזכויות שמורות. האתר מופעל כפורטל צרכנות המשתתף בתוכניות אפילייאט ועלול להרוויח עמלות מהפניות.</p>
     </footer>
     
-<!-- Meta CAPI SubID Capture & Affiliate Injection Engine -->
+<!-- Meta CAPI SubID Capture, Injection & S2S Click-Out Engine -->
 <script>
 (function() {
-    // 1. פונקציה לחילוץ פרמטרים משורת ה-URL
+    // 1. פונקציות עזר לחילוץ פרמטרים ועוגיות
     function getUrlParameter(name) {
         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
         var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -231,39 +231,76 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     }
 
-    // 2. איתור fbclid וייצור מחרוזת fbc תקנית
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(";").shift();
+        return '';
+    }
+
+    // 2. איתור וקידוד fbc ו-fbp
     var fbclid = getUrlParameter('fbclid');
-    var fbcString = '';
+    var fbcString = localStorage.getItem('_sa_meta_fbc') || '';
 
     if (fbclid) {
-        // יצירת חותמת זמן Unix בשניות
         var unixTimestamp = Math.floor(Date.now() / 1000);
         fbcString = 'fb.1.' + unixTimestamp + '.' + fbclid;
-        // שמירה בזיכרון המקומי של הדפדפן לשרידות בסשן
         localStorage.setItem('_sa_meta_fbc', fbcString);
-    } else {
-        // ניסיון שליפה מהזיכרון המקומי במקרה של מעבר בין דפים באתר
-        fbcString = localStorage.getItem('_sa_meta_fbc') || '';
     }
 
-    // 3. הזרקת ה-fbc לכל קישורי האפילייאט של AliExpress בעמוד
-    if (fbcString) {
-        document.addEventListener('DOMContentLoaded', function() {
-            // איתור כל התגיות שמכילות קישורי אליאקספרס (כולל s.click)
-            var affiliateLinks = document.querySelectorAll('a[href*="aliexpress.com"], a[href*="s.click"]');
-            
-            affiliateLinks.forEach(function(link) {
+    var fbpString = getCookie('_fbp') || '';
+
+    // 3. הזרקה לקישורים והאזנה ללחיצה
+    document.addEventListener('DOMContentLoaded', function() {
+        var affiliateLinks = document.querySelectorAll('a[href*="aliexpress.com"], a[href*="s.click"]');
+        
+        affiliateLinks.forEach(function(link) {
+            // הזרקת sub_id לקישור האפילייאט
+            if (fbcString) {
                 var currentHref = link.getAttribute('href');
-                // בדיקה האם הקישור כבר מכיל פרמטרים (סימן שאלה) כדי לדעת האם לשרשר עם & או ?
                 var separator = currentHref.indexOf('?') !== -1 ? '&' : '?';
+                link.setAttribute('href', currentHref + separator + 'sub_id=' + encodeURIComponent(fbcString));
+            }
+            
+            // טיפול באירוע Click Out
+            link.addEventListener('click', function(e) {
+                // יצירת event_id ייחודי למניעת כפילויות (Deduplication)
+                var eventId = 'clickout_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
                 
-                // הערה קריטית: אם אתה עובד מול Admitad שנה כאן מ-'sub_id=' ל-'subid1='
-                var newHref = currentHref + separator + 'sub_id=' + encodeURIComponent(fbcString);
-                
-                link.setAttribute('href', newHref);
+                // א. שיגור צד-לקוח (Client-Side Pixel)
+                if (typeof fbq !== 'undefined') {
+                    fbq('track', 'InitiateCheckout', {
+                        content_name: 'AliExpress_ClickOut',
+                        currency: 'USD',
+                        value: 0.00
+                    }, { eventID: eventId });
+                }
+
+                // ב. שיגור צד-שרת ישיר (S2S Request to sGTM)
+                var sGtmEndpoint = 'https://server-side-tagging-gyigxwbnda-uc.a.run.app/clickout';
+                var payload = {
+                    event_name: 'InitiateCheckout',
+                    event_id: eventId,
+                    fbc: fbcString,
+                    fbp: fbpString,
+                    event_source_url: window.location.href,
+                    user_agent: navigator.userAgent
+                };
+
+                // שיגור בשיטת Beacon/Fetch ללא עיכוב המעבר של הגולש
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon(sGtmEndpoint, JSON.stringify(payload));
+                } else {
+                    fetch(sGtmEndpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                        keepalive: true
+                    });
+                }
             });
         });
-    }
+    });
 })();
 </script>
     
