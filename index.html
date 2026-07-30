@@ -220,7 +220,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p>© 2026 אלי דילס. כל הזכויות שמורות. האתר מופעל כפורטל צרכנות המשתתף בתוכניות אפילייאט ועלול להרוויח עמלות מהפניות.</p>
     </footer>
     
-<!-- Meta CAPI SubID Capture, Injection & S2S Click-Out Engine -->
+<!-- Meta CAPI SubID Capture, Injection & S2S Click-Out Engine (Universal Listener) -->
 <script>
 (function() {
     // 1. פונקציות עזר לחילוץ פרמטרים ועוגיות
@@ -238,7 +238,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         return '';
     }
 
-    // 2. איתור וקידוד fbc ו-fbp
+    // 2. לכידת fbc ו-fbp
     var fbclid = getUrlParameter('fbclid');
     var fbcString = localStorage.getItem('_sa_meta_fbc') || '';
 
@@ -250,57 +250,60 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     var fbpString = getCookie('_fbp') || '';
 
-    // 3. הזרקה לקישורים והאזנה ללחיצה
-    document.addEventListener('DOMContentLoaded', function() {
-        var affiliateLinks = document.querySelectorAll('a[href*="aliexpress.com"], a[href*="s.click"]');
+    // 3. האזנה גלובלית לכל הקלקה בדף (Event Delegation)
+    document.addEventListener('click', function(e) {
+        // איתור הקישור - בודק אם האלמנט הנלחץ או אחד מאבותיו הוא תגית <a>
+        var link = e.target.closest('a');
         
-        affiliateLinks.forEach(function(link) {
-            // הזרקת sub_id לקישור האפילייאט
-            if (fbcString) {
-                var currentHref = link.getAttribute('href');
-                var separator = currentHref.indexOf('?') !== -1 ? '&' : '?';
-                link.setAttribute('href', currentHref + separator + 'sub_id=' + encodeURIComponent(fbcString));
-            }
+        if (!link) return;
+
+        var href = link.getAttribute('href') || '';
+
+        // בדיקה מקיפה אם הקישור מוביל לאליאקספרס / אפיליאציה
+        if (href.indexOf('s.click.aliexpress.com') !== -1 || href.indexOf('aliexpress.com') !== -1) {
             
-            // טיפול באירוע Click Out
-            link.addEventListener('click', function(e) {
-                // יצירת event_id ייחודי למניעת כפילויות (Deduplication)
-                var eventId = 'clickout_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
-                
-                // א. שיגור צד-לקוח (Client-Side Pixel)
-                if (typeof fbq !== 'undefined') {
-                    fbq('track', 'InitiateCheckout', {
-                        content_name: 'AliExpress_ClickOut',
-                        currency: 'USD',
-                        value: 0.00
-                    }, { eventID: eventId });
-                }
+            // א. הזרקת sub_id לקישור אם עדיין לא קיים
+            if (fbcString && href.indexOf('sub_id=') === -1) {
+                var separator = href.indexOf('?') !== -1 ? '&' : '?';
+                var updatedHref = href + separator + 'sub_id=' + encodeURIComponent(fbcString);
+                link.setAttribute('href', updatedHref);
+            }
 
-                // ב. שיגור צד-שרת ישיר (S2S Request to sGTM)
-                var sGtmEndpoint = 'https://server-side-tagging-gyigxwbnda-uc.a.run.app/clickout';
-                var payload = {
-                    event_name: 'InitiateCheckout',
-                    event_id: eventId,
-                    fbc: fbcString,
-                    fbp: fbpString,
-                    event_source_url: window.location.href,
-                    user_agent: navigator.userAgent
-                };
+            // ב. יצירת event_id ייחודי למניעת כפילויות (Deduplication)
+            var eventId = 'clickout_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
 
-                // שיגור בשיטת Beacon/Fetch ללא עיכוב המעבר של הגולש
-                if (navigator.sendBeacon) {
-                    navigator.sendBeacon(sGtmEndpoint, JSON.stringify(payload));
-                } else {
-                    fetch(sGtmEndpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload),
-                        keepalive: true
-                    });
-                }
-            });
-        });
-    });
+            // ג. שיגור Pixel בדפדפן (Client-Side)
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'InitiateCheckout', {
+                    content_name: 'AliExpress_ClickOut',
+                    currency: 'USD',
+                    value: 0.00
+                }, { eventID: eventId });
+            }
+
+            // ד. שיגור S2S לשרת ה-sGTM
+            var sGtmEndpoint = 'https://server-side-tagging-gyigxwbnda-uc.a.run.app/clickout';
+            var payload = {
+                event_name: 'InitiateCheckout',
+                event_id: eventId,
+                fbc: fbcString,
+                fbp: fbpString,
+                event_source_url: window.location.href,
+                user_agent: navigator.userAgent
+            };
+
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(sGtmEndpoint, JSON.stringify(payload));
+            } else {
+                fetch(sGtmEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    keepalive: true
+                });
+            }
+        }
+    }, true); // true מבטיח לכידה בשלב ה-Capture
 })();
 </script>
     
